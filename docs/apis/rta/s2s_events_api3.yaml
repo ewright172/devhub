@@ -475,6 +475,8 @@ components:
             Populate this field as follows: 
             - `true`: if the user agreed to share the advertiser ID. 
             - `false`: if the user enabled Limited Ad Tracking (LAT). 
+        consent_data:
+          $ref: '#/components/schemas/ConsentData'
 
     ErrorResponse:
       type: string
@@ -832,6 +834,9 @@ components:
             Populate this field as follows: 
             - `true`: if the user agreed to share the advertiser ID. 
             - `false`: if the user enabled Limited Ad Tracking (LAT).
+        consent_data:
+          $ref: '#/components/schemas/ConsentData'
+
     IdfaId:
       title: iOS IDFA
       type: object
@@ -1179,8 +1184,56 @@ components:
             Populate this field as follows: 
             - `true`: if the user agreed to share the advertiser ID. 
             - `false`: if the user enabled Limited Ad Tracking (LAT).
+        
     
+    ConsentData:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/TCFConsent'
+        - $ref: '#/components/schemas/ManualConsent'
 
+    TCFConsent:
+      type: object
+      description: |
+        You can find instructions how to collect the TCF information from the device storage [here](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details), based on this mapping:
+        IABTCF_PolicyVesrion → policy_version
+        IABTCF_gdprApplies → gdpr_applies
+        IABTCF_CmpSdkID → cmp_sdk_id
+        IABTCF_CmpSdkVersion → cmp_sdk_version
+        IABTCF_TCString → tcstring
+      properties:
+        tcf:
+          type: object
+          properties:
+            policy_version:
+              type: integer
+              description: Version number of the policy
+            gdpr_applies:
+              type: integer
+              enum: [-1, 0, 1]
+              description: Binary value indicating if GDPR applies
+            cmp_sdk_id:
+              type: integer
+              description: Identifier for the Consent Management Provider SDK
+            cmp_sdk_version:
+              type: integer
+              description: Version number of the CMP SDK
+            tcstring:
+              type: string
+              description: Transparency and Consent String provided by the CMP
 
-
-
+    ManualConsent:
+      type: object
+      properties:
+        manual:
+          type: object
+          properties:
+            gdpr_applies:
+              type: boolean
+              description: Indicates if GDPR applies
+            ad_user_data_enabled:
+              type: boolean
+              description: Indicates if the user data for ads is enabled
+            ad_personalization_enabled:
+              type: boolean
+              description: Indicates if ad personalization is enabled
